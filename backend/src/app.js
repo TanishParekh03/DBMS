@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const cors = require("cors")
 const userRoutes = require('./routes/users/users');
+const vendorRoutes = require('./routes/vendors/vendors');
 const { errorHandler } = require('./middlewares/errorHandler');
 const app = express();
 app.use(cors())
@@ -11,6 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 const port = process.env.PORT || 3000
 
 app.use(userRoutes);
+app.use(vendorRoutes);
 
 app.get('/', (req, res) => {
     res.status(200).json({ msg: "server is running" })
