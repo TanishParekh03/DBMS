@@ -2,8 +2,9 @@ const express = require('express');
 const dotenv = require('dotenv');
 dotenv.config();
 const cors = require("cors")
-const userRoutes = require('./routes/users/users');
-const vendorRoutes = require('./routes/vendors/vendors');
+const userRoutes = require('./routes/users');
+const vendorRoutes = require('./routes/vendors');
+const commodityRoutes = require('./routes/commodities');
 const { errorHandler } = require('./middlewares/errorHandler');
 const app = express();
 app.use(cors())
@@ -13,6 +14,7 @@ const port = process.env.PORT || 3000
 
 app.use(userRoutes);
 app.use(vendorRoutes);
+app.use(commodityRoutes);
 
 app.get('/', (req, res) => {
     res.status(200).json({ msg: "server is running" })

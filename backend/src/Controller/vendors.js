@@ -1,10 +1,9 @@
 const pool = require('../db/db')
-const { getVendorQuery, getAllVendorsQuery, getVendorsForUserQuery, addNewVendorQuery, updateVendorQuery, deleteVendorQuery } = require('../services/vendorQueries')
+const { getVendorQuery, getAllVendorsQuery, getAllVendorsForUserQuery, addNewVendorQuery, updateVendorQuery, deleteVendorQuery } = require('../services/vendorQueries')
 const getVendor = async (req, res, next) => {
     try {
         const vendorId = req.params.id;
         const result = await pool.query(getVendorQuery, [vendorId])
-
         if (result.rows.length === 0) {
             const err = new Error("Vendor not found")
             err.status = 404
@@ -33,10 +32,10 @@ const getAllVendors = async (req, res, next) => {
         return next(err)
     }
 }
-const getVendorsForUser = async (req, res, next) => {
+const getAllVendorsForUser = async (req, res, next) => {
     try {
-        const userId = req.params.user_id;
-        const result = await pool.query(getVendorsForUserQuery, [userId])
+        const userId = req.params.userId;
+        const result = await pool.query(getAllVendorsForUserQuery, [userId])
 
         if (!result || result.rows.length == 0) {
             const err = new Error("No Vendors found for this user")
@@ -80,7 +79,17 @@ const updateVendor = async (req, res, next) => {
     try {
         const vendorId = req.params.id;
         const { name, phone_number } = req.body;
-        const result = await pool.query(updateVendorQuery, [name, phone_number, vendorId])
+        const fetchVendorData = await pool.query(getVendorQuery, [vendorId])
+        if (fetchVendorData || fetchVendorData.rows.length == 0) {
+            const err = new Error("Vendor not found")
+            err.status = 404
+            return next(err)
+        }
+        name = name ?? fetchVendorData.rows[0].name
+        phone_number = phone_number ?? fetchVendorData.rows[0].phone_number
+
+        const result = await pool.query
+            (updateVendorQuery, [name, phone_number, vendorId])
 
         if (result.rows.length === 0) {
             const err = new Error("Vendor not found")
@@ -122,4 +131,4 @@ const deleteVendor = async (req, res, next) => {
     }
 }
 
-module.exports = { getVendor, getAllVendors, getVendorsForUser, addNewVendor, updateVendor, deleteVendor }
+module.exports = { getVendor, getAllVendors, getAllVendorsForUser, addNewVendor, updateVendor, deleteVendor }
